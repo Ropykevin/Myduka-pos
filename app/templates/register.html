@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Register - MyDuka POS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+    <div class="col-md-5">
+        <div class="card shadow-lg">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Create Your Account</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person"></i> Username
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username" required
+                            placeholder="Choose a username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input type="email" class="form-control form-control-lg" id="email" name="email" required
+                            placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password"
+                            required placeholder="Create a password">
+                    </div>
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">
+                            <i class="bi bi-lock-fill"></i> Confirm Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="confirm_password"
+                            name="confirm_password" required placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-rocket-takeoff"></i> Get Started
+                    </button>
+                </form>
+                <hr>
+                <p class="text-center mb-0 text-muted">
+                    Already have an account?
+                    <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">Login here</a>
+                </p>
+                <p class="text-center mt-2 mb-0">
+                    <a href="{{ url_for('index') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Back to Home
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

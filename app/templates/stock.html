@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Stock - MyDuka POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-stack"></i> Stock Management</h2>
+        <p class="text-muted mb-0">Track and manage your inventory</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addStockModal">
+        <i class="bi bi-plus-circle"></i> Add Stock
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Stock Entries</h5>
+    </div>
+    <div class="card-body">
+        {% if stock_items|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="stockTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash"></i> ID</th>
+                        <th><i class="bi bi-box"></i> Product</th>
+                        <th><i class="bi bi-123"></i> Quantity</th>
+                        <th><i class="bi bi-calendar"></i> Restock Date</th>
+                        <th><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in stock_items %}
+                    <tr>
+                        <td><span class="badge bg-secondary">#{{ item.id }}</span></td>
+                        <td><strong>{{ item.product.name }}</strong></td>
+                        <td><span class="badge bg-primary fs-6">{{ item.quantity }} units</span></td>
+                        <td><i class="bi bi-clock"></i> {{ item.restock_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_stock', id=item.id) }}"
+                                style="display:inline;"
+                                onsubmit="return confirm('Are you sure you want to delete this stock entry?');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-stack" style="font-size: 64px; color: #ccc;"></i>
+            <p class="text-muted mt-3">No stock entries found. Add stock to your products!</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                <i class="bi bi-plus-circle"></i> Add Stock
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add Stock</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_stock') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="product_id" class="form-label">
+                            <i class="bi bi-box-seam"></i> Product <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-lg" id="product_id" name="product_id" required>
+                            <option value="">Select a product</option>
+                            {% for item in products_with_stock %}
+                            <option value="{{ item.product.id }}">{{ item.product.name }} (Current Stock: {{ item.stock
+                                }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">
+                            <i class="bi bi-123"></i> Quantity <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" min="1" class="form-control form-control-lg" id="quantity" name="quantity"
+                            required placeholder="Enter quantity">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-info text-white">
+                        <i class="bi bi-check-circle"></i> Add Stock
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        $('#stockTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            order: [[3, 'desc']], // Order by restock date descending
+            responsive: true
+        });
+    });
+</script>
+{% endblock %}

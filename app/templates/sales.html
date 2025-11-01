@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}Sales - MyDuka POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-cart-check"></i> Sales Management</h2>
+        <p class="text-muted mb-0">View and manage all sales transactions</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addSaleModal">
+        <i class="bi bi-plus-circle"></i> New Sale
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Sales History</h5>
+    </div>
+    <div class="card-body">
+        {% if sales_list|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="salesTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash"></i> Sale ID</th>
+                        <th><i class="bi bi-person"></i> Customer</th>
+                        <th><i class="bi bi-box"></i> Items</th>
+                        <th><i class="bi bi-currency-dollar"></i> Total Amount</th>
+                        <th><i class="bi bi-graph-up"></i> Profit</th>
+                        <th><i class="bi bi-calendar"></i> Date</th>
+                        <th><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales_list %}
+                    <tr>
+                        <td><span class="badge bg-primary fs-6">#{{ sale.id }}</span></td>
+                        <td><strong>{{ sale.customer.name if sale.customer else 'Walk-in' }}</strong></td>
+                        <td><span class="badge bg-info">{{ sale.items|length }} item(s)</span></td>
+                        <td><strong class="text-success">KES {{ "{:,.2f}".format(sale.total_amount) }}</strong></td>
+                        <td><span class="badge bg-success">KES {{ "{:,.2f}".format(sale.total_profit) }}</span></td>
+                        <td><i class="bi bi-clock"></i> {{ sale.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('sale_receipt', id=sale.id) }}" target="_blank"
+                                class="btn btn-sm btn-primary">
+                                <i class="bi bi-receipt"></i> Receipt
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart-check" style="font-size: 64px; color: #ccc;"></i>
+            <p class="text-muted mt-3">No sales found. Create your first sale!</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSaleModal">
+                <i class="bi bi-plus-circle"></i> New Sale
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Sale Modal -->
+<div class="modal fade" id="addSaleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-cart-plus"></i> New Sale Transaction</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="customer_select" class="form-label">
+                            <i class="bi bi-person"></i> Customer (Optional)
+                        </label>
+                        <select class="form-select form-select-lg" id="customer_select">
+                            <option value="">Walk-in Customer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-plus-circle"></i> Add Products to Sale
+                    </label>
+                    <div class="input-group input-group-lg">
+                        <select class="form-select" id="product_select">
+                            <option value="">Select a product</option>
+                        </select>
+                        <input type="number" class="form-control" id="product_quantity" placeholder="Quantity" min="1"
+                            value="1">
+                        <button type="button" class="btn btn-primary" id="add_product_btn">
+                            <i class="bi bi-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="sale_items_table">
+                        <thead class="table-success">
+                            <tr>
+                                <th><i class="bi bi-box"></i> Product</th>
+                                <th><i class="bi bi-123"></i> Quantity</th>
+                                <th><i class="bi bi-tag"></i> Unit Price</th>
+                                <th><i class="bi bi-calculator"></i> Total</th>
+                                <th><i class="bi bi-gear"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sale_items_body">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-cart-x" style="font-size: 32px;"></i>
+                                    <p class="mt-2 mb-0">No items added yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                <td><strong id="sale_total" class="text-success fs-5">KES 0.00</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success btn-lg" id="complete_sale_btn">
+                    <i class="bi bi-check-circle"></i> Complete Sale
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable for Sales
+        if ($('#salesTable').length) {
+            $('#salesTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [[5, 'desc']], // Order by date descending
+                responsive: true
+            });
+        }
+    });
+
+    let products = [];
+    let customers = [];
+    let saleItems = [];
+
+    // Load products and customers
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(data => {
+            products = data;
+            const select = document.getElementById('product_select');
+            data.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - KES ${product.price.toFixed(2)} (Stock: ${product.stock})`;
+                option.dataset.stock = product.stock;
+                option.dataset.price = product.price;
+                select.appendChild(option);
+            });
+        });
+
+    fetch('/api/customers')
+        .then(response => response.json())
+        .then(data => {
+            customers = data;
+            const select = document.getElementById('customer_select');
+            data.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
+        });
+
+    function updateSaleTotal() {
+        const total = saleItems.reduce((sum, item) => sum + item.total_price, 0);
+        document.getElementById('sale_total').textContent = `KES ${total.toFixed(2)}`;
+    }
+
+    function renderSaleItems() {
+        const tbody = document.getElementById('sale_items_body');
+        if (saleItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-cart-x" style="font-size: 32px;"></i><p class="mt-2 mb-0">No items added yet</p></td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = saleItems.map((item, index) => {
+            const product = products.find(p => p.id === item.product_id);
+            const availableStock = product ? product.stock : 0;
+            return `
+            <tr data-index="${index}">
+                <td><strong>${item.product_name}</strong></td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" 
+                               class="form-control form-control-sm quantity-input" 
+                               value="${item.quantity}" 
+                               min="1" 
+                               max="${availableStock}"
+                               style="width: 80px;"
+                               data-index="${index}"
+                               data-stock="${availableStock}">
+                        <span class="badge bg-info">Max: ${availableStock}</span>
+                    </div>
+                </td>
+                <td>KES ${item.unit_price.toFixed(2)}</td>
+                <td><strong class="text-success">KES ${item.total_price.toFixed(2)}</strong></td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-warning edit-item-btn" data-index="${index}" title="Update Quantity">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger remove-item-btn" data-index="${index}" title="Remove Item">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        }).join('');
+
+        // Add event listeners for quantity inputs
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    const index = parseInt(this.dataset.index);
+                    updateItemQuantity(index);
+                }
+            });
+
+            input.addEventListener('blur', function () {
+                const index = parseInt(this.dataset.index);
+                updateItemQuantity(index);
+            });
+        });
+
+        // Add edit event listeners
+        document.querySelectorAll('.edit-item-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const index = parseInt(this.dataset.index);
+                updateItemQuantity(index);
+            });
+        });
+
+        // Add remove event listeners
+        document.querySelectorAll('.remove-item-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const index = parseInt(this.dataset.index);
+                saleItems.splice(index, 1);
+                renderSaleItems();
+                updateSaleTotal();
+            });
+        });
+    }
+
+    function updateItemQuantity(index) {
+        const input = document.querySelector(`.quantity-input[data-index="${index}"]`);
+        if (!input) return;
+
+        const newQuantity = parseInt(input.value) || 1;
+        const maxStock = parseInt(input.dataset.stock) || 0;
+        const item = saleItems[index];
+
+        if (newQuantity <= 0) {
+            alert('Quantity must be greater than 0');
+            input.value = item.quantity;
+            return;
+        }
+
+        if (newQuantity > maxStock) {
+            alert(`Cannot exceed available stock. Available: ${maxStock}`);
+            input.value = item.quantity;
+            return;
+        }
+
+        // Update quantity and total price
+        item.quantity = newQuantity;
+        item.total_price = item.unit_price * newQuantity;
+
+        renderSaleItems();
+        updateSaleTotal();
+    }
+
+    document.getElementById('add_product_btn').addEventListener('click', function () {
+        const productId = parseInt(document.getElementById('product_select').value);
+        const quantity = parseInt(document.getElementById('product_quantity').value) || 1;
+
+        if (!productId) {
+            alert('Please select a product');
+            return;
+        }
+
+        const productOption = document.getElementById('product_select').options[document.getElementById('product_select').selectedIndex];
+        const product = products.find(p => p.id === productId);
+        const availableStock = parseInt(productOption.dataset.stock);
+
+        if (quantity <= 0) {
+            alert('Quantity must be greater than 0');
+            return;
+        }
+
+        if (quantity > availableStock) {
+            alert(`Insufficient stock. Available: ${availableStock}`);
+            return;
+        }
+
+        // Check if product already in sale items
+        const existingIndex = saleItems.findIndex(item => item.product_id === productId);
+        if (existingIndex !== -1) {
+            const newQuantity = saleItems[existingIndex].quantity + quantity;
+            if (newQuantity > availableStock) {
+                alert(`Cannot add more. Available stock: ${availableStock}`);
+                return;
+            }
+            saleItems[existingIndex].quantity = newQuantity;
+            saleItems[existingIndex].total_price = saleItems[existingIndex].unit_price * newQuantity;
+        } else {
+            const unitPrice = parseFloat(productOption.dataset.price);
+            saleItems.push({
+                product_id: productId,
+                product_name: product.name,
+                quantity: quantity,
+                unit_price: unitPrice,
+                total_price: unitPrice * quantity
+            });
+        }
+
+        renderSaleItems();
+        updateSaleTotal();
+
+        // Reset form
+        document.getElementById('product_select').value = '';
+        document.getElementById('product_quantity').value = 1;
+    });
+
+    document.getElementById('complete_sale_btn').addEventListener('click', function () {
+        if (saleItems.length === 0) {
+            alert('Please add at least one product to the sale');
+            return;
+        }
+
+        const customerId = document.getElementById('customer_select').value || null;
+
+        const saleData = {
+            customer_id: customerId,
+            items: saleItems.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity
+            }))
+        };
+
+        fetch('/sales/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(saleData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sale completed successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+    });
+
+    // Reset sale items when modal is closed
+    document.getElementById('addSaleModal').addEventListener('hidden.bs.modal', function () {
+        saleItems = [];
+        renderSaleItems();
+        updateSaleTotal();
+        document.getElementById('customer_select').value = '';
+    });
+</script>
+{% endblock %}

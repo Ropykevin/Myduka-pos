@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MyDuka POS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* DataTables customization */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard Overview</h2>
+
+<!-- Daily Sales Cards -->
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0" style="font-size: 0.8rem; font-weight: 600; color: #3b82f6;"><i
+                        class="bi bi-calendar-day"></i> Today's Sales Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-2 text-info">Today's Sales</h6>
+                            <h3 class="text-primary mb-0">KES {{ "{:,.2f}".format(daily_sales_amount) }}
+                            </h3>
+                            <small class="text-muted"><i class="bi bi-cart-check"></i> {{ daily_sales_count
+                                }} transaction(s)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-2">Today's Profit</h6>
+                            <h3 class="text-success mb-0">KES {{ "{:,.2f}".format(daily_profit) }}</h3>
+                            {% if daily_sales_amount > 0 %}
+                            <small class="text-muted">{{
+                                "{:.1f}".format((daily_profit/daily_sales_amount)*100) }}% margin</small>
+                            {% else %}
+                            <small class="text-muted">No sales today</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h6 class="text-muted mb-2">Transactions</h6>
+                            <h3 class="text-info mb-0">{{ daily_sales_count }}</h3>
+                            <small class="text-muted">Sales today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Business Worth Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-warning shadow-lg"
+            style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+            <div class="card-body text-white">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="mb-2"><i class="bi bi-bank"></i> Business Worth</h4>
+                        <h2 class="mb-3 fw-bold">KES {{ "{:,.2f}".format(business_worth) }}</h2>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <p class="mb-1 small opacity-75">Inventory Value (at cost)</p>
+                                <p class="mb-0 fw-bold">KES {{ "{:,.2f}".format(inventory_value_at_cost) }}
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1 small opacity-75">Total Profit Earned</p>
+                                <p class="mb-0 fw-bold">KES {{ "{:,.2f}".format(total_profit) }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1 small opacity-75">Potential Value (if all sold)</p>
+                                <p class="mb-0 fw-bold">KES {{ "{:,.2f}".format(potential_business_worth) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <i class="bi bi-piggy-bank" style="font-size: 120px; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overall Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-uppercase small">Total Sales</h6>
+                        <h3 class="card-title mb-0">KES {{ "{:,.2f}".format(total_sales) }}</h3>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-uppercase small">Total Profit</h6>
+                        <h3 class="card-title mb-0">KES {{ "{:,.2f}".format(total_profit) }}</h3>
+                    </div>
+                    <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-uppercase small">Total Stock</h6>
+                        <h3 class="card-title mb-0">{{ "{:,}".format(total_stock) }}</h3>
+                    </div>
+                    <i class="bi bi-stack fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-uppercase small">Products</h6>
+                        <h3 class="card-title mb-0">{{ top_products|length }}</h3>
+                    </div>
+                    <i class="bi bi-box-seam fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Sales Chart -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Sales Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailySalesChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Sales by Product</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top Selling Products</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="topProductsTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Total Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td><span class="badge bg-primary">{{ product.total_sold }}</span></td>
+                            </tr>
+                            {% endfor %}
+                            {% if top_products|length == 0 %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted">No products sold yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Sales Table -->
+{% if today_sales|length > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Today's Sales Transactions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="todaySalesTable">
+                        <thead>
+                            <tr>
+                                <th>Sale ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Profit</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in today_sales %}
+                            <tr>
+                                <td>#{{ sale.id }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'Walk-in' }}</td>
+                                <td><span class="badge bg-info">{{ sale.items|length }} item(s)</span></td>
+                                <td><strong>KES {{ "{:,.2f}".format(sale.total_amount) }}</strong></td>
+                                <td class="text-success">KES {{ "{:,.2f}".format(sale.total_profit) }}</td>
+                                <td>{{ sale.created_at.strftime('%H:%M:%S') }}</td>
+                                <td>
+                                    <a href="{{ url_for('sale_receipt', id=sale.id) }}" target="_blank"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="bi bi-receipt"></i> Receipt
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-primary">
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>KES {{ "{:,.2f}".format(daily_sales_amount) }}</strong></td>
+                                <td class="text-success"><strong>KES {{ "{:,.2f}".format(daily_profit)
+                                        }}</strong></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Sales</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="recentSalesTable">
+                        <thead>
+                            <tr>
+                                <th>Sale ID</th>
+                                <th>Customer</th>
+                                <th>Total Amount</th>
+                                <th>Profit</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in recent_sales %}
+                            <tr>
+                                <td>#{{ sale.id }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'Walk-in' }}</td>
+                                <td>KES {{ "{:,.2f}".format(sale.total_amount) }}</td>
+                                <td>KES {{ "{:,.2f}".format(sale.total_profit) }}</td>
+                                <td>{{ sale.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('sale_receipt', id=sale.id) }}" target="_blank"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="bi bi-receipt"></i> Receipt
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize DataTables
+    $(document).ready(function () {
+        // Top Products Table
+        if ($('#topProductsTable tbody tr').length > 0) {
+            $('#topProductsTable').DataTable({
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]],
+                order: [[1, 'desc']],
+                searching: false,
+                info: false
+            });
+        }
+
+        // Today's Sales Table
+        if ($('#todaySalesTable').length) {
+            $('#todaySalesTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                order: [[5, 'desc']]
+            });
+        }
+
+        // Recent Sales Table
+        $('#recentSalesTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            order: [[4, 'desc']]
+        });
+    });
+
+    // Daily Sales Chart (Last 7 Days)
+    const dailyLabels = {{ chart_labels | tojson }};
+    const dailyData = {{ chart_data | tojson }};
+    const dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
+
+    if (dailyData && dailyData.length > 0) {
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: 'Daily Sales (KES)',
+                    data: dailyData,
+                    borderColor: 'rgb(102, 126, 234)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgb(102, 126, 234)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'KES ' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'KES ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        dailyCtx.canvas.parentElement.innerHTML = '<p class="text-muted text-center py-5">No daily sales data available yet.</p>';
+    }
+
+    // Sales by Product Chart
+    const salesData = {{ sales_per_product | tojson }};
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    if (salesData && salesData.length > 0) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: salesData.map(item => item[0]),
+                datasets: [{
+                    label: 'Revenue (KES)',
+                    data: salesData.map(item => item[1]),
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'KES ' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'KES ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        ctx.canvas.parentElement.innerHTML = '<p class="text-muted text-center py-5">No sales data available yet.</p>';
+    }
+</script>
+{% endblock %}

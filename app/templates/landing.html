@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDuka POS - Modern Point of Sale System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .navbar-landing {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-landing fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+                <i class="bi bi-shop"></i> MyDuka POS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-gradient text-white px-3" href="{{ url_for('register') }}">Get
+                            Started</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="display-4 fw-bold mb-4">Modern POS System for Your Business</h1>
+                    <p class="lead mb-4">Streamline your sales, manage inventory, and grow your business with our
+                        comprehensive Point of Sale solution.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('register') }}" class="btn btn-gradient btn-lg">
+                            <i class="bi bi-rocket-takeoff"></i> Get Started Free
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-content text-center">
+                    <div class="mt-5 mt-lg-0">
+                        <i class="bi bi-cart-check" style="font-size: 300px; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">Powerful Features</h2>
+                <p class="lead text-muted">Everything you need to manage your business efficiently</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Product Management</h5>
+                            <p class="text-muted">Easily add, edit, and manage your products with detailed cost and
+                                pricing information.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-stack"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Inventory Tracking</h5>
+                            <p class="text-muted">Real-time stock management with automatic updates on sales. Never run
+                                out of stock again.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-cart-check"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Batch Sales</h5>
+                            <p class="text-muted">Process multiple products in a single transaction. Fast, efficient,
+                                and user-friendly.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Customer Management</h5>
+                            <p class="text-muted">Maintain a comprehensive database of your customers with contact
+                                information.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Analytics Dashboard</h5>
+                            <p class="text-muted">Track sales, profits, and top-selling products with beautiful charts
+                                and statistics.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Printable Receipts</h5>
+                            <p class="text-muted">Generate professional receipts for every transaction. Print or save as
+                                PDF.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section section">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <div class="h1 fw-bold text-primary mb-2">100%</div>
+                    <p class="text-muted mb-0">Cloud-Based</p>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <div class="h1 fw-bold text-primary mb-2">24/7</div>
+                    <p class="text-muted mb-0">Access</p>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <div class="h1 fw-bold text-primary mb-2">Secure</div>
+                    <p class="text-muted mb-0">Data Protection</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="h1 fw-bold text-primary mb-2">Easy</div>
+                    <p class="text-muted mb-0">To Use</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="display-5 fw-bold mb-4">Why Choose MyDuka POS?</h2>
+                    <p class="lead mb-4">MyDuka POS is designed for businesses of all sizes. Whether you run a small
+                        shop or a large retail store, our system adapts to your needs.</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>User-Friendly
+                                Interface</strong> - Intuitive design that anyone can master</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Real-Time
+                                Updates</strong> - Stock levels update automatically</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Comprehensive
+                                Reports</strong> - Track sales, profits, and performance</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Secure &
+                                Reliable</strong> - Your data is safe with us</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>No Hidden
+                                Costs</strong> - Transparent pricing</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="testimonial-card mt-4 mt-lg-0">
+                        <div class="mb-3">
+                            <i class="bi bi-quote" style="font-size: 3rem; color: #667eea;"></i>
+                        </div>
+                        <p class="fst-italic mb-3">"MyDuka POS has transformed how we manage our business. The inventory
+                            tracking alone has saved us countless hours and prevented stockouts."</p>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div>
+                                <strong>Business Owner</strong>
+                                <p class="text-muted mb-0 small">Retail Store</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="hero-section" style="padding: 60px 0;">
+        <div class="container text-center hero-content">
+            <h2 class="display-5 fw-bold mb-4">Ready to Get Started?</h2>
+            <p class="lead mb-4">Join thousands of businesses already using MyDuka POS</p>
+            <a href="{{ url_for('register') }}" class="btn btn-gradient btn-lg">
+                <i class="bi bi-rocket-takeoff"></i> Start Your Free Account
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-shop"></i> MyDuka POS</h5>
+                    <p class="text-muted mb-0">Modern Point of Sale System for Modern Businesses</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-0">&copy; 2024 MyDuka POS. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.navbar-landing');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+    </script>
+</body>
+
+</html>

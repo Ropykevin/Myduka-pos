@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Products - MyDuka POS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-box-seam"></i> Products Management</h2>
+        <p class="text-muted mb-0">Manage your product catalog</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        <i class="bi bi-plus-circle"></i> Add New Product
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Products List</h5>
+    </div>
+    <div class="card-body">
+        {% if products_with_stock|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="productsTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash"></i> ID</th>
+                        <th><i class="bi bi-box"></i> Name</th>
+                        <th><i class="bi bi-currency-dollar"></i> Cost (KES)</th>
+                        <th><i class="bi bi-tag"></i> Price (KES)</th>
+                        <th><i class="bi bi-stack"></i> Stock</th>
+                        <th><i class="bi bi-graph-up"></i> Profit/Unit</th>
+                        <th><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in products_with_stock %}
+                    <tr>
+                        <td><span class="badge bg-secondary">#{{ item.product.id }}</span></td>
+                        <td><strong>{{ item.product.name }}</strong></td>
+                        <td>{{ "{:,.2f}".format(item.product.cost) }}</td>
+                        <td><strong class="text-success">{{ "{:,.2f}".format(item.product.price) }}</strong></td>
+                        <td>
+                            {% if item.stock > 0 %}
+                            <span class="badge bg-success fs-6">{{ item.stock }} units</span>
+                            {% else %}
+                            <span class="badge bg-danger fs-6">Out of Stock</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-info">{{ "{:,.2f}".format(item.product.get_profit_per_unit())
+                                }}</span></td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                    data-bs-target="#editProductModal" data-id="{{ item.product.id }}"
+                                    data-name="{{ item.product.name }}" data-cost="{{ item.product.cost }}"
+                                    data-price="{{ item.product.price }}">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_product', id=item.product.id) }}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete {{ item.product.name }}?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam" style="font-size: 64px; color: #ccc;"></i>
+            <p class="text-muted mt-3">No products found. Add your first product to get started!</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="bi bi-plus-circle"></i> Add Product
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Product</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_product') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            <i class="bi bi-box"></i> Product Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name" required
+                            placeholder="Enter product name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cost" class="form-label">
+                            <i class="bi bi-currency-dollar"></i> Cost (KES) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg" id="cost"
+                            name="cost" required placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">
+                            <i class="bi bi-tag"></i> Selling Price (KES) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg" id="price"
+                            name="price" required placeholder="0.00">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title"><i class="bi bi-pencil"></i> Edit Product</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="editProductForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">
+                            <i class="bi bi-box"></i> Product Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_cost" class="form-label">
+                            <i class="bi bi-currency-dollar"></i> Cost (KES) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg" id="edit_cost"
+                            name="cost" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_price" class="form-label">
+                            <i class="bi bi-tag"></i> Selling Price (KES) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg" id="edit_price"
+                            name="price" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-check-circle"></i> Update Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        $('#productsTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            order: [[0, 'asc']],
+            responsive: true
+        });
+    });
+
+    const editModal = document.getElementById('editProductModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        const cost = button.getAttribute('data-cost');
+        const price = button.getAttribute('data-price');
+
+        const form = document.getElementById('editProductForm');
+        form.action = '/products/edit/' + id;
+
+        document.getElementById('edit_name').value = name;
+        document.getElementById('edit_cost').value = cost;
+        document.getElementById('edit_price').value = price;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt #{{ sale.id }} - MyDuka POS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-body" id="receipt" style="background: white;">
+                <div class="text-center mb-4">
+                    <h2 class="mb-2"><i class="bi bi-shop"></i> MyDuka POS</h2>
+                    <p class="mb-1 text-muted">Receipt #{{ sale.id }}</p>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-calendar"></i> {{ sale.created_at.strftime('%Y-%m-%d') }}
+                        <i class="bi bi-clock ms-2"></i> {{ sale.created_at.strftime('%H:%M:%S') }}
+                    </p>
+                </div>
+
+                <hr class="border-primary border-2">
+
+                <div class="mb-3 p-3 bg-light rounded">
+                    <p class="mb-0">
+                        <strong><i class="bi bi-person"></i> Customer:</strong>
+                        <span class="text-primary">{{ sale.customer.name if sale.customer else 'Walk-in Customer'
+                            }}</span>
+                    </p>
+                </div>
+
+                <hr>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-primary">
+                            <tr>
+                                <th><i class="bi bi-box"></i> Product</th>
+                                <th class="text-center"><i class="bi bi-123"></i> Qty</th>
+                                <th class="text-end"><i class="bi bi-tag"></i> Price</th>
+                                <th class="text-end"><i class="bi bi-calculator"></i> Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in sale.items %}
+                            <tr>
+                                <td><strong>{{ item.product.name }}</strong></td>
+                                <td class="text-center"><span class="badge bg-primary">{{ item.quantity }}</span></td>
+                                <td class="text-end">KES {{ "{:,.2f}".format(item.unit_price) }}</td>
+                                <td class="text-end"><strong>KES {{ "{:,.2f}".format(item.total_price) }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-success">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                <td class="text-end"><strong class="fs-5">KES {{ "{:,.2f}".format(sale.total_amount)
+                                        }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><small class="text-muted">Profit:</small></td>
+                                <td class="text-end"><small class="text-success">KES {{
+                                        "{:,.2f}".format(sale.total_profit) }}</small></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <hr class="border-primary border-2">
+
+                <div class="text-center mt-4 p-3 bg-light rounded">
+                    <p class="mb-1 fw-bold">Thank you for your business!</p>
+                    <p class="mb-0 text-muted small">Please come again</p>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="text-center">
+                    <button onclick="window.print()" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-printer"></i> Print Receipt
+                    </button>
+                    <a href="{{ url_for('sales') }}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back to Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #receipt,
+        #receipt * {
+            visibility: visible;
+        }
+
+        #receipt {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .card-footer {
+            display: none !important;
+        }
+
+        .navbar {
+            display: none !important;
+        }
+
+        .container-fluid {
+            padding: 0 !important;
+        }
+    }
+
+    #receipt {
+        font-family: 'Courier New', monospace;
+    }
+</style>
+{% endblock %}
