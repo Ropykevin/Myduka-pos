@@ -4,7 +4,7 @@ services:
     web:
         build: .
         # env_file: .env
-        container_name: techelar
+        container_name: Myduka
         restart: always
         ports:
             - 5011:80
