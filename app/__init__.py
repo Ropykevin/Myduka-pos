@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_login import LoginManager
-from config import Config
+from app.config import Config
 
 # Import db from models to avoid circular imports
 from app.models import db
